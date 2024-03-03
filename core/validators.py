@@ -201,7 +201,7 @@ class StringField(Field):
         if self.REGEX_PATTERN:
             # If a regex pattern is defined, use it to validate
             self._regex_validation(value)
-r
+
 
 class EmailField(StringField):
     REGEX_PATTERN = re.compile(
