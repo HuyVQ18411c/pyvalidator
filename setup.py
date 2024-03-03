@@ -1,10 +1,10 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import pathlib
 
-here = pathlib.Path(__file__).parent.resolve()
 
+current = pathlib.Path(__file__).parent.resolve()
 # Get the long description from the README file
-long_description = (here / 'README.md').read_text(encoding='utf-8')
+long_description = (current / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='pyvalidator',
@@ -12,11 +12,15 @@ setup(
     description='Simple type validator in pure Python',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='',
+    url='https://github.com/HuyVQ18411c/pyvalidator',
     author='Huy Vu',
     author_email='vuquanghuy2k@gmail.com',
     keywords='validators, typing',
     classifiers=[
-        'Programming Language :: Python :: 3.10'
-    ]
+        'Programming Language :: Python :: 3.12'
+    ],
+    install_requires=[],
+    extras_require={
+        'test': ['pytest']
+    }
 )

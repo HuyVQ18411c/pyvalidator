@@ -112,8 +112,8 @@ class NumericField(Field):
         max_value: NumericType = None,
         **kwargs
     ):
-        self._min_value = self.__field_type__(min_value)
-        self._max_value = self.__field_type__(max_value)
+        self._min_value = self.__field_type__(min_value) if min_value is not None else min_value
+        self._max_value = self.__field_type__(max_value) if max_value is not None else max_value
         super().__init__(**kwargs)
 
     def _built_in_validation(self, value):
@@ -201,7 +201,7 @@ class StringField(Field):
         if self.REGEX_PATTERN:
             # If a regex pattern is defined, use it to validate
             self._regex_validation(value)
-
+r
 
 class EmailField(StringField):
     REGEX_PATTERN = re.compile(
