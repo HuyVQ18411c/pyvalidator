@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from core.validators import (
+from pyvalidator.core.validators import (
     IntField,
     StringField,
     EmailField,

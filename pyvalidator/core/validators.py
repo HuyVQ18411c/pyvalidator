@@ -36,11 +36,18 @@ class Field:
         force_conversion: bool = False,
         **kwargs,
     ):
+        """
+        Parameters
+        ----------
+        default (any): default value for field
+        nullable (bool): is field able to set to None
+        custom_validators (list[callable]): list of user-defined functions to validate value
+        force_conversion (bool): is forced to cast to desired type before perform validation
+        """
         if self.__field_type__ is None:
             raise ValueError('Type is not set for field')
 
-        self._value = None
-        self._default = default
+        self._value = default
         self._nullable = nullable
         self._force_conversion = force_conversion
 
