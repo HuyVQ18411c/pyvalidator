@@ -19,7 +19,9 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3.12'
     ],
-    install_requires=[],
+    install_requires=[
+        'python-dateutil',
+    ],
     extras_require={
         'test': ['pytest']
     }

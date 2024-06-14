@@ -1,13 +1,20 @@
-__all__ = [
+__all__ = (
     'Field',
     'IntField',
     'FloatField',
     'StringField',
     'EmailField',
     'URLField',
-]
+    'DateField',
+)
 
 import re
+from datetime import date, datetime
+from typing import override
+
+from dateutil.parser import parse
+
+from pyvalidator.core.exceptions import ConversionError
 
 # Define a UnionType for Numeric base class
 NumericType = int | float
@@ -34,6 +41,7 @@ class Field:
         nullable: bool = False,
         custom_validators: list[callable] = None,
         force_conversion: bool = False,
+        custom_conversion: callable = None,
         **kwargs,
     ):
         """
@@ -50,6 +58,7 @@ class Field:
         self._value = default
         self._nullable = nullable
         self._force_conversion = force_conversion
+        self._conversion_func = custom_conversion or self.__field_type__
 
         if custom_validators is None:
             self._custom_validators = []
@@ -64,14 +73,24 @@ class Field:
         return self._value
 
     def __set__(self, instance, value: any) -> None:
-        if self._force_conversion:
-            # Don't try/catch, let it raise exception
-            value = self.__field_type__(value)
+        value = self._convert_value(value)
 
         self.validate(value)
 
         # Value is safe to be set
         self._value = value
+
+    def set_conversion_func(self, func: callable):
+        self._conversion_func = func
+
+    def _convert_value(self, value: any):
+        if self._force_conversion:
+            try:
+                return self._conversion_func(value)
+            except Exception as ex:
+                raise ConversionError(ex)
+
+        return value
 
     def _built_in_validation(self, value: any):
         raise NotImplementedError('Initial validator for %s is not implemented' % self.__class__.__name__)
@@ -123,6 +142,7 @@ class NumericField(Field):
         self._max_value = self.__field_type__(max_value) if max_value is not None else max_value
         super().__init__(**kwargs)
 
+    @override
     def _built_in_validation(self, value):
         if self._min_value is not None and value < self._min_value:
             raise ValueError(
@@ -183,6 +203,7 @@ class StringField(Field):
                 )
             )
 
+    @override
     def _built_in_validation(self, value: str):
         value_length = len(value)
         if self._min_length is not None and value_length < self._min_length:
@@ -231,3 +252,53 @@ class URLField(StringField):
         r'(?:/?|[/?]\S+)$',
         re.IGNORECASE
     )
+
+
+#######################
+# DateTime Validators #
+#######################
+class BaseDateField(Field):
+    __field_type__ = None
+
+    def __init__(self, *, min_date=None, max_date=None, **kwargs):
+        self._min_date = min_date
+        self._max_date = max_date
+        super().__init__(**kwargs)
+        if not kwargs.get('_conversion_func'):
+            self.set_conversion_func(parse)
+
+    @override
+    def _built_in_validation(self, value: any):
+        if self._max_date is not None and self._max_date:
+            if value > self._max_date:
+                raise ValueError(
+                    self._get_error_message(
+                        field_name=self._field_name,
+                        field_value=value,
+                        error='greater than max date',
+                        boundary_value=self._max_date,
+                    )
+                )
+
+        if self._min_date is not None and self._min_date:
+            if value < self._min_date:
+                raise ValueError(
+                    self._get_error_message(
+                        field_name=self._field_name,
+                        field_value=value,
+                        error='smaller than max date',
+                        boundary_value=self._min_date,
+                    )
+                )
+
+
+class DateField(BaseDateField):
+    __field_type__ = date
+
+    def __init__(self, *arg, **kwargs):
+        super().__init__(**kwargs)
+        self.set_conversion_func(lambda value: parse(value).date())
+
+
+class DateTimeField(BaseDateField):
+    __field_type__ = datetime
