@@ -20,7 +20,6 @@ class MatureAudienceForm(AudienceForm):
     last_login = DateTimeField(nullable=True, force_conversion=True)
 
     def clean(self):
-        print(self.last_login, self.age)
         if (datetime.now().year - self.last_login.year) > self.age:
             raise ValidationError('Invalid last login year')
 

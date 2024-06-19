@@ -88,7 +88,7 @@ class Field:
         self._conversion_func = func
 
     def _convert_value(self, value: any):
-        if self._force_conversion:
+        if self._force_conversion and not isinstance(value, self.__field_type__):
             try:
                 return self._conversion_func(value)
             except Exception as ex:

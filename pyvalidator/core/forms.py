@@ -87,8 +87,9 @@ class Form(metaclass=BaseFormMetaClass):
         """
         for key, value in self.declared_fields.items():
             try:
+                setattr(self, key, self._data[key])
                 # Call the custom clean methods first
-                cleaned_field = self._clean_field(key, self._data[key])
+                cleaned_field = self._clean_field(key, getattr(self, key))
                 # Set value to field
                 setattr(self, key, cleaned_field)
                 self._cleaned_data[key] = value
