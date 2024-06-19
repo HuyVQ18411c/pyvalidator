@@ -1,11 +1,15 @@
 __all__ = (
     'Field',
+    # Numeric fields
     'IntField',
     'FloatField',
+    # String fields
     'StringField',
     'EmailField',
     'URLField',
+    # Datetime fields
     'DateField',
+    'DateTimeField',
 )
 
 import re
@@ -181,11 +185,11 @@ class StringField(Field):
     REGEX_PATTERN = None
 
     def __init__(
-            self,
-            *,
-            min_length: int = None,
-            max_length: int = None,
-            **kwargs
+        self,
+        *,
+        min_length: int = None,
+        max_length: int = None,
+        **kwargs
     ):
         # Set min length = 0 to allow blank
         self._min_length = min_length

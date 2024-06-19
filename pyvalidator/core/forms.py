@@ -107,5 +107,11 @@ class Form(metaclass=BaseFormMetaClass):
         self._clean_fields()
 
         # Run custom clean, usually use with cleaned_data
-        if hasattr(self, 'clean'):
-            getattr(self, 'clean')()
+        try:
+            if hasattr(self, 'clean') and not self._errors:
+                getattr(self, 'clean')()
+        except Exception as ex:
+            if self._raise_exception_on_error:
+                raise ex
+            else:
+                self._errors[self.__class__.__name__].append(ex)
