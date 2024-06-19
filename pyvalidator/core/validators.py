@@ -14,7 +14,6 @@ __all__ = (
 
 import re
 from datetime import date, datetime
-from typing import override
 
 from dateutil.parser import parse
 
@@ -146,7 +145,6 @@ class NumericField(Field):
         self._max_value = self.__field_type__(max_value) if max_value is not None else max_value
         super().__init__(**kwargs)
 
-    @override
     def _built_in_validation(self, value):
         if self._min_value is not None and value < self._min_value:
             raise ValueError(
@@ -207,7 +205,6 @@ class StringField(Field):
                 )
             )
 
-    @override
     def _built_in_validation(self, value: str):
         value_length = len(value)
         if self._min_length is not None and value_length < self._min_length:
@@ -271,7 +268,6 @@ class BaseDateField(Field):
         if not kwargs.get('_conversion_func'):
             self.set_conversion_func(parse)
 
-    @override
     def _built_in_validation(self, value: any):
         if self._max_date is not None and self._max_date:
             if value > self._max_date:
